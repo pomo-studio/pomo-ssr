@@ -1,4 +1,4 @@
-name: Deploy Application
+name: Deploy
 
 on:
   push:
@@ -8,40 +8,65 @@ on:
       - 'scripts/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
 
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # Check if secrets are configured
+  check-config:
+    name: Check Configuration
     runs-on: ubuntu-latest
-    
+    outputs:
+      has_secrets: ${{ steps.check.outputs.has_secrets }}
+      has_config: ${{ steps.check.outputs.has_config }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Check for AWS credentials
-        id: check-secrets
+        id: check
         run: |
-          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
-            echo "has_secrets=false" >> $GITHUB_OUTPUT
-            echo "⚠️  AWS secrets not configured. Skipping deployment."
-            echo ""
-            echo "To enable deployment, add these GitHub secrets:"
-            echo "  - AWS_ACCESS_KEY_ID"
-            echo "  - AWS_SECRET_ACCESS_KEY"
-            echo "  - AWS_PRIMARY_REGION"
-            echo "  - INFRA_OUTPUTS_JSON"
-            echo ""
-            echo "See docs/infrastructure-setup.md for setup instructions."
-          else
+          # Check AWS secrets
+          if [ -n "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
             echo "has_secrets=true" >> $GITHUB_OUTPUT
-            echo "✅ AWS secrets found. Proceeding with deployment."
+            echo "✅ AWS secrets found"
+          else
+            echo "has_secrets=false" >> $GITHUB_OUTPUT
+            echo "⚠️ AWS secrets not configured"
+          fi
+          
+          # Check if INFRA_OUTPUTS_JSON secret exists
+          if [ -n "${{ secrets.INFRA_OUTPUTS_JSON }}" ]; then
+            echo "has_config=true" >> $GITHUB_OUTPUT
+            echo "✅ Infrastructure config found"
+          else
+            echo "has_config=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Infrastructure config not found"
           fi
 
+  # Build and deploy
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    needs: check-config
+    if: needs.check-config.outputs.has_secrets == 'true' && needs.check-config.outputs.has_config == 'true'
+    environment: production
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
-        if: steps.check-secrets.outputs.has_secrets == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -49,24 +74,76 @@ jobs:
           cache-dependency-path: app/package.json
 
       - name: Configure AWS Credentials
-        if: steps.check-secrets.outputs.has_secrets == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_PRIMARY_REGION }}
 
-      - name: Deploy
-        if: steps.check-secrets.outputs.has_secrets == 'true'
+      - name: Install dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Write infrastructure config
         env:
           INFRA_CONFIG: ${{ github.workspace }}/config/infra-outputs.json
         run: |
-          # Write infra config from secret
           echo '${{ secrets.INFRA_OUTPUTS_JSON }}' > "$INFRA_CONFIG"
-          ./scripts/deploy.sh
+          echo "✅ Infrastructure config written"
 
-      - name: Notify (secrets not configured)
-        if: steps.check-secrets.outputs.has_secrets == 'false'
+      - name: Deploy
+        env:
+          INFRA_CONFIG: ${{ github.workspace }}/config/infra-outputs.json
+        run: ./scripts/deploy.sh
+
+      - name: Get Application URL
+        id: get-url
         run: |
-          echo "::notice::Deployment skipped - AWS secrets not configured yet"
-          echo "::notice::This is expected for new repositories. Add secrets when infrastructure is ready."
+          URL=$(echo '${{ secrets.INFRA_OUTPUTS_JSON }}' | jq -r '.application_url.value // .application_url')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "🌐 Application URL: $URL"
+
+      - name: Smoke Test
+        run: |
+          echo "Waiting for deployment to propagate..."
+          sleep 15
+          
+          URL="${{ steps.get-url.outputs.url }}/api/health"
+          echo "Testing: $URL"
+          
+          # Try up to 3 times
+          for i in 1 2 3; do
+            if curl -sf "$URL" > /dev/null; then
+              echo "✅ Smoke test passed!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying..."
+            sleep 10
+          done
+          
+          echo "❌ Smoke test failed"
+          exit 1
+
+      - name: Notify Success
+        run: |
+          echo "::notice::✅ Deployment successful!"
+          echo "::notice::Application URL: ${{ steps.get-url.outputs.url }}"
+
+  # Notify when deployment is skipped
+  skip-notify:
+    name: Notify Skipped
+    runs-on: ubuntu-latest
+    needs: check-config
+    if: needs.check-config.outputs.has_secrets != 'true' || needs.check-config.outputs.has_config != 'true'
+    steps:
+      - name: Provide setup instructions
+        run: |
+          echo "::warning::Deployment skipped - configuration incomplete"
+          echo ""
+          echo "To enable deployment, add these GitHub secrets:"
+          echo "  1. AWS_ACCESS_KEY_ID"
+          echo "  2. AWS_SECRET_ACCESS_KEY"
+          echo "  3. AWS_PRIMARY_REGION (e.g., us-east-1)"
+          echo "  4. INFRA_OUTPUTS_JSON (from terraform output)"
+          echo ""
+          echo "See docs/infrastructure-setup.md for detailed instructions."

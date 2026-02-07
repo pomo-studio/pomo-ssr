@@ -1,0 +1,57 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'scripts/**'
+
+jobs:
+  # Post PR comment with deployment info
+  pr-info:
+    name: PR Information
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Post PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Check if infra config exists in PR
+            const hasConfig = fs.existsSync(path.join(process.env.GITHUB_WORKSPACE, 'config/infra-outputs.json'));
+            
+            const body = `## 🚀 PR Deployment Check
+            
+            ${hasConfig 
+              ? '✅ Infrastructure configuration found'
+              : '⚠️ No infrastructure configuration found. The app will use bootstrap mode until configured.'}
+            
+            ### Next Steps After Merge:
+            
+            1. If AWS secrets are configured, this PR will auto-deploy to production when merged
+            2. If not configured, add secrets (see docs/infrastructure-setup.md)
+            
+            ### Testing:
+            
+            - [ ] Build passes
+            - [ ] Type check passes  
+            - [ ] Deployment script is executable
+            
+            ---
+            
+            *This is an automated message from the CI/CD pipeline*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
