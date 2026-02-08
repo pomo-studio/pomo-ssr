@@ -224,6 +224,7 @@ See [Infrastructure Setup](docs/infrastructure-setup.md) for details.
 
 - [Infrastructure Setup](docs/infrastructure-setup.md) - Deploy the infrastructure
 - [Deployment Guide](docs/deployment.md) - Deploy application updates
+- [Caching Strategy](docs/CACHING.md) - CloudFront caching configuration and best practices
 
 ## License
 
