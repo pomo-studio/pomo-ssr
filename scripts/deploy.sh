@@ -56,6 +56,7 @@ echo "📋 Loading configuration from $CONFIG_FILE"
 PROJECT_NAME=$(jq -r '.app_config.value.project_name' "$CONFIG_FILE")
 PRIMARY_REGION=$(jq -r '.app_config.value.primary_region' "$CONFIG_FILE")
 DR_REGION=$(jq -r '.app_config.value.dr_region' "$CONFIG_FILE")
+DYNAMODB_TABLE=$(jq -r '.app_config.value.dynamodb.table_name' "$CONFIG_FILE")
 LAMBDA_PRIMARY=$(jq -r '.app_config.value.lambda.primary.function_name' "$CONFIG_FILE")
 LAMBDA_DR=$(jq -r '.app_config.value.lambda.dr.function_name' "$CONFIG_FILE")
 S3_BUCKET_PRIMARY=$(jq -r '.app_config.value.lambda.primary.s3_bucket' "$CONFIG_FILE")
@@ -65,11 +66,19 @@ CF_DIST_ID=$(jq -r '.app_config.value.cloudfront.distribution_id' "$CONFIG_FILE"
 
 echo "🚀 Deploying $PROJECT_NAME"
 echo "   Primary: $PRIMARY_REGION | DR: $DR_REGION"
+echo "   DynamoDB: $DYNAMODB_TABLE"
 
 # Build application
 echo "🔨 Building application..."
 cd app
 rm -rf .output
+
+# Export config as environment variables for Nuxt build
+# This ensures the app bakes in the correct values from Terraform
+export DYNAMODB_TABLE="$DYNAMODB_TABLE"
+export PRIMARY_REGION="$PRIMARY_REGION"
+export DR_REGION="$DR_REGION"
+
 NITRO_PRESET=aws-lambda npm install
 NITRO_PRESET=aws-lambda npm run build
 
