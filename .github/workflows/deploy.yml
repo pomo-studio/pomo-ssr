@@ -89,10 +89,6 @@ jobs:
           echo "Authenticated as:"
           aws sts get-caller-identity
 
-      - name: Install dependencies
-        working-directory: app
-        run: npm ci
-
       - name: Write infrastructure config
         env:
           INFRA_CONFIG: ${{ github.workspace }}/config/infra-outputs.json
