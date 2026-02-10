@@ -1,15 +1,9 @@
 name: Sync Infrastructure Config
 
 on:
-  # Trigger manually after TFC apply
+  # Manual trigger only — requires TF_API_TOKEN secret to be set in repo settings
+  # (pomo-ssr uses TFC backend; add TF_API_TOKEN secret before enabling push trigger)
   workflow_dispatch:
-
-  # Or trigger automatically after infra changes
-  push:
-    branches: [main]
-    paths:
-      - 'infra/**/*.tf'
-      - 'infra/**/*.tfvars'
 
 # Required to update GitHub variables
 permissions:
@@ -48,7 +42,7 @@ jobs:
 
       - name: Update GitHub Variable
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "🔄 Updating INFRA_OUTPUTS_JSON variable..."
 
@@ -62,7 +56,7 @@ jobs:
 
       - name: Verify Update
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "✅ INFRA_OUTPUTS_JSON was last updated:"
           gh variable list | grep INFRA_OUTPUTS_JSON || echo "Variable exists (no timestamp shown)"
