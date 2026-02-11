@@ -10,11 +10,12 @@ terraform {
     }
   }
 
-  # Store state in Terraform Cloud
+  # Replace with your Terraform Cloud organization and workspace name.
+  # Keep this block — the sync workflow needs it to read TFC outputs.
   cloud {
-    organization = "Pitangaville"
+    organization = "your-tfc-org"
     workspaces {
-      name = "pomossr"
+      name = "your-workspace-name"
     }
   }
 }

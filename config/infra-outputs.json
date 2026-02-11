@@ -1,94 +1,39 @@
 {
   "app_config": {
-    "sensitive": true,
-    "type": [
-      "object",
-      {
-        "cloudfront": [
-          "object",
-          {
-            "distribution_id": "string",
-            "domain_name": "string"
-          }
-        ],
-        "dr_region": "string",
-        "dynamodb": [
-          "object",
-          {
-            "table_name": "string"
-          }
-        ],
-        "lambda": [
-          "object",
-          {
-            "dr": [
-              "object",
-              {
-                "function_name": "string",
-                "function_url": "string",
-                "s3_bucket": "string",
-                "s3_key": "string"
-              }
-            ],
-            "primary": [
-              "object",
-              {
-                "function_name": "string",
-                "function_url": "string",
-                "s3_bucket": "string",
-                "s3_key": "string"
-              }
-            ]
-          }
-        ],
-        "primary_region": "string",
-        "project_name": "string",
-        "static_assets": [
-          "object",
-          {
-            "s3_bucket": "string"
-          }
-        ]
-      }
-    ],
     "value": {
-      "cloudfront": {
-        "distribution_id": "E14GYG5S4H8IU8",
-        "domain_name": "d1ykjosh3f5qmb.cloudfront.net"
-      },
+      "project_name": "my-app",
+      "primary_region": "us-east-1",
       "dr_region": "us-west-2",
-      "dynamodb": {
-        "table_name": "pomo-ssr-visits"
-      },
       "lambda": {
-        "dr": {
-          "function_name": "pomo-ssr-dr",
-          "function_url": "https://c4ymxzfhajojgo7o43iiafnype0djweh.lambda-url.us-west-2.on.aws/",
-          "s3_bucket": "pomo-ssr-lambda-deployments-137064409667-us-west-2",
+        "primary": {
+          "function_name": "my-app-primary",
+          "function_url": "https://placeholder.lambda-url.us-east-1.on.aws/",
+          "s3_bucket": "my-app-deployments-123456789012-us-east-1",
           "s3_key": "lambda/function.zip"
         },
-        "primary": {
-          "function_name": "pomo-ssr-primary",
-          "function_url": "https://pr3nf3szcsy4zncu5coleqwf6y0emirl.lambda-url.us-east-1.on.aws/",
-          "s3_bucket": "pomo-ssr-lambda-deployments-137064409667-us-east-1",
+        "dr": {
+          "function_name": "my-app-dr",
+          "function_url": "https://placeholder.lambda-url.us-west-2.on.aws/",
+          "s3_bucket": "my-app-deployments-123456789012-us-west-2",
           "s3_key": "lambda/function.zip"
         }
       },
-      "primary_region": "us-east-1",
-      "project_name": "pomo-ssr",
       "static_assets": {
-        "s3_bucket": "pomo-ssr-static-137064409667"
+        "s3_bucket": "my-app-static-123456789012"
+      },
+      "cloudfront": {
+        "distribution_id": "E1234567890ABC",
+        "domain_name": "d1234567890abc.cloudfront.net"
+      },
+      "dynamodb": {
+        "table_name": "my-app-visits"
       }
     }
   },
   "application_url": {
-    "sensitive": false,
-    "type": "string",
-    "value": "https://ssr.pomo.dev"
+    "value": "https://app.example.com"
   },
   "cloudfront_domain_name": {
-    "sensitive": false,
-    "type": "string",
-    "value": "d1ykjosh3f5qmb.cloudfront.net"
+    "value": "d1234567890abc.cloudfront.net"
   }
 }
