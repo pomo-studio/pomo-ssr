@@ -11,7 +11,7 @@ Demo site for **serverless-ssr-module** - showcasing server-side rendering on AW
 ```
 pomo-ssr/                       # Monorepo
 ├── infra/                      # Terraform infrastructure
-│   ├── main.tf                 # Uses serverless-ssr-module v2.2.2
+│   ├── main.tf                 # Uses serverless-ssr-module v2.2.3
 │   ├── outputs.tf              # Exports app_config
 │   ├── terraform.auto.tfvars   # Configuration
 │   └── versions.tf             # Terraform Cloud backend
@@ -69,7 +69,7 @@ Shared:
 - ACM certificates (from pomo repo)
 ```
 
-**Infrastructure managed by**: [serverless-ssr-module](https://github.com/apitanga/serverless-ssr-module) v2.2.2
+**Infrastructure managed by**: [serverless-ssr-module](https://github.com/apitanga/serverless-ssr-module) v2.2.3
 
 ---
 
@@ -175,7 +175,7 @@ cd .. && ./scripts/deploy.sh
 
 ```hcl
 module "ssr" {
-  source = "github.com/apitanga/serverless-ssr-module?ref=v2.2.2"
+  source = "github.com/apitanga/serverless-ssr-module?ref=v2.2.3"
 
   project_name    = "pomo-ssr"
   domain_name     = "pomo.dev"

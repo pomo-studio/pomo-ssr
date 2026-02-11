@@ -3,7 +3,7 @@
 # When forking, replace values marked ← with your own.
 
 module "ssr" {
-  source = "github.com/apitanga/serverless-ssr-module?ref=v2.2.2"
+  source = "github.com/apitanga/serverless-ssr-module?ref=v2.2.3"
 
   providers = {
     aws.primary = aws.primary
