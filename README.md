@@ -175,7 +175,8 @@ cd .. && ./scripts/deploy.sh
 
 ```hcl
 module "ssr" {
-  source = "github.com/pomo-studio/terraform-aws-serverless-ssr?ref=v2.2.4"
+  source  = "pomo-studio/serverless-ssr/aws"
+  version = "~> 2.2"
 
   project_name    = "pomo-ssr"
   domain_name     = "pomo.dev"
