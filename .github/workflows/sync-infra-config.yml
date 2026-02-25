@@ -2,9 +2,14 @@ name: Sync Infrastructure Config
 
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: ["Infrastructure"]
+    types: [completed]
     branches: [main]
-    paths: ['infra/**/*.tf', 'infra/**/*.tfvars']
+
+concurrency:
+  group: sync-infra-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write  # Required to commit infra outputs file
@@ -13,6 +18,7 @@ jobs:
   sync-config:
     name: Sync Infra Outputs
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Checkout

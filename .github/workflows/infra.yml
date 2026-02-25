@@ -12,6 +12,10 @@ on:
       - 'infra/**'
   workflow_dispatch:
 
+concurrency:
+  group: infra-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   TF_IN_AUTOMATION: true
 
