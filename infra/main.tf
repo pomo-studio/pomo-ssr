@@ -3,7 +3,7 @@
 # When forking, replace values marked ← with your own.
 
 module "ssr" {
-  source = "git::https://github.com/pomo-studio/terraform-aws-serverless-ssr.git?ref=v2.4.11"
+  source = "git::https://github.com/pomo-studio/terraform-aws-serverless-ssr.git?ref=v2.4.12"
 
   providers = {
     aws.primary = aws.primary
