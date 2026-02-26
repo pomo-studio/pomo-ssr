@@ -4,7 +4,7 @@
 
 module "ssr" {
   source  = "pomo-studio/serverless-ssr/aws"
-  version = "= 2.4.13"
+  version = "= 2.4.14"
 
   providers = {
     aws.primary = aws.primary
