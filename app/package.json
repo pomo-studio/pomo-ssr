@@ -14,13 +14,13 @@
     "build:lambda": "NITRO_PRESET=aws-lambda npm run build"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.500.0",
-    "@aws-sdk/lib-dynamodb": "^3.500.0",
-    "nuxt": "^3.10.0",
-    "vue": "^3.4.0",
-    "vue-router": "^4.2.0"
+    "@aws-sdk/client-dynamodb": "^3.1126.0",
+    "@aws-sdk/lib-dynamodb": "^3.1126.0",
+    "nuxt": "^3.21.11",
+    "vue": "^3.5.42",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/node": "^22.0.0"
   }
 }
