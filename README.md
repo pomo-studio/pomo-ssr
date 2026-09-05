@@ -4,6 +4,8 @@ Demo site for **terraform-aws-serverless-ssr** — showcasing server-side render
 
 **Live Demo**: [ssr.pomo.dev](https://ssr.pomo.dev)
 
+- [Changelog](CHANGELOG.md)
+
 ---
 
 ## Project Structure
