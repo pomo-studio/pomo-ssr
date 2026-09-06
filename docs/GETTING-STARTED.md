@@ -717,3 +717,16 @@ Actions alone leaves resources live.
 - **Custom domain later:** this sandbox provisioning policy intentionally excludes
   ACM/Route 53. Adding a domain requires a separately reviewed DNS/certificate
   permission expansion and configuration, outside this first deployment.
+
+## TL;DR
+
+1. Fork `pomo-studio/pomo-ssr`, delete inherited `config/infra-outputs.json`, and keep Actions disabled.
+2. Replace the module block in `infra/main.tf` with your project name and `domain_name = null`.
+3. Update `infra/versions.tf` with your HCP Terraform organization and workspace.
+4. Create OIDC providers and two scoped IAM roles in AWS for HCP Terraform and GitHub Actions.
+5. Attach the bounded inline provisioning policy to the HCP Terraform role.
+6. Create a VCS-connected HCP Terraform workspace for the `infra/` directory with dynamic AWS credentials.
+7. Review and apply the Terraform plan, then sync the outputs to `config/infra-outputs.json`.
+8. Add the scoped deployment policy to the GitHub Actions role and set `AWS_ROLE_ARN` as a repository secret.
+9. Run the Deploy workflow and verify `/api/health` and `/api/render` on your CloudFront URL.
+10. Make a local change, merge it, and tear down the workspace through TFC when you are done.
