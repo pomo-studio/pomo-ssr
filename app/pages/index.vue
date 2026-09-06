@@ -1,165 +1,155 @@
-<template>
-  <div>
-    <header class="header">
-      <h1>🌍 SSR Server Clock</h1>
-      <p>Server-side rendered with Nuxt/Nitro on AWS Lambda</p>
-    </header>
+<script setup lang="ts">
+interface RenderData {
+  time: string
+  date: string
+  timezone: string
+  region: string
+  regionName: string
+  latency: number
+  renderMode: string
+  requestId: string
+  coldStart: boolean
+  counter: number
+  version: string
+}
 
-    <div class="dashboard">
-      <!-- Server Time Card -->
-      <div class="card">
-        <div class="card-header">
-          <span>⏰</span>
-          Server Time
-        </div>
-        <div class="card-value">{{ serverTime }}</div>
-        <div class="card-subtext">
-          {{ serverDate }}<br>
-          Timezone: {{ timezone }}
-        </div>
-      </div>
-
-      <!-- Region Card -->
-      <div class="card">
-        <div class="card-header">
-          <span>🌎</span>
-          Serving Region
-        </div>
-        <div class="card-value">
-          <span class="region-badge" :class="regionClass">
-            <span class="status-dot status-online"></span>
-            {{ region }}
-          </span>
-        </div>
-        <div class="card-subtext">
-          {{ regionName }}<br>
-          Latency: ~{{ latency }}ms
-        </div>
-      </div>
-
-      <!-- Weather Card -->
-      <div class="card">
-        <div class="card-header">
-          <span>🌡️</span>
-          Weather
-        </div>
-        <div v-if="weather" class="weather-content">
-          <div class="weather-icon">{{ weatherIcon }}</div>
-          <div class="temperature">{{ weather.temperature }}°{{ weather.unit }}</div>
-          <div class="card-subtext">
-            {{ weather.description }}<br>
-            {{ weather.location }}
-          </div>
-        </div>
-        <div v-else class="loading">
-          <div class="spinner"></div>
-        </div>
-      </div>
-
-      <!-- Visit Counter Card -->
-      <div class="card">
-        <div class="card-header">
-          <span>👥</span>
-          Visit Count
-        </div>
-        <div class="card-value">{{ formatNumber(counter) }}</div>
-        <div class="card-subtext">
-          Total visits across all regions<br>
-          Updates in real-time
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin Section -->
-    <div class="admin-section">
-      <h2>🧪 Testing & Diagnostics</h2>
-      <p>Current rendering mode: <strong>{{ renderMode }}</strong></p>
-      <p>Request ID: <code>{{ requestId }}</code></p>
-      <br>
-      <button 
-        class="button button-danger" 
-        @click="testFailover"
-        :disabled="loading"
-      >
-        {{ loading ? 'Testing...' : 'Test Failover' }}
-      </button>
-      <p v-if="failoverResult" class="card-subtext" style="margin-top: 1rem;">
-        {{ failoverResult }}
-      </p>
-    </div>
-  </div>
-</template>
-
-<script setup>
-// This page is server-side rendered
-const { data: pageData } = await useFetch('/api/dashboard', {
-  key: 'dashboard-data',
-  server: true
+useHead({
+  title: 'Serverless SSR Proof | ssr.pomo.dev',
+  meta: [{ name: 'description', content: 'A live server-side rendered page running on AWS Lambda, deployed with terraform-aws-serverless-ssr.' }],
 })
 
-// Client-side weather fetch (needs IP)
-const { data: weather } = await useFetch('/api/weather', {
-  server: false // Fetch on client to get accurate IP
+const { data: pageData, refresh } = await useFetch<RenderData>('/api/render', {
+  key: 'render-data',
+  server: true,
 })
 
-// Computed values from server data
-const serverTime = computed(() => pageData.value?.time || '---')
-const serverDate = computed(() => pageData.value?.date || '---')
-const timezone = computed(() => pageData.value?.timezone || '---')
-const region = computed(() => pageData.value?.region || 'unknown')
-const regionName = computed(() => pageData.value?.regionName || 'Unknown Region')
-const counter = computed(() => pageData.value?.counter || 0)
-const latency = computed(() => pageData.value?.latency || 0)
-const renderMode = computed(() => pageData.value?.renderMode || 'unknown')
-const requestId = computed(() => pageData.value?.requestId || '---')
+const healthResult = ref('')
+const healthLoading = ref(false)
 
-// Region styling
-const regionClass = computed(() => {
-  return region.value.includes('east') ? 'region-primary' : 'region-dr'
-})
-
-// Weather icon mapping
-const weatherIcon = computed(() => {
-  if (!weather.value) return '🌡️'
-  const desc = weather.value.description?.toLowerCase() || ''
-  if (desc.includes('clear') || desc.includes('sun')) return '☀️'
-  if (desc.includes('cloud')) return '☁️'
-  if (desc.includes('rain')) return '🌧️'
-  if (desc.includes('snow')) return '❄️'
-  if (desc.includes('thunder')) return '⛈️'
-  return '🌡️'
-})
-
-// Number formatting
-const formatNumber = (num) => {
+const formatNumber = (num?: number) => {
+  if (num === undefined) return '---'
   return new Intl.NumberFormat().format(num)
 }
 
-// Failover testing
-const loading = ref(false)
-const failoverResult = ref('')
-
-const testFailover = async () => {
-  loading.value = true
-  failoverResult.value = 'Testing...'
-  
+const testHealth = async () => {
+  healthLoading.value = true
+  healthResult.value = ''
+  const start = performance.now()
   try {
-    // Make request to test routing
-    const start = performance.now()
-    const response = await fetch('/api/health')
+    const res = await fetch('/api/health')
     const duration = Math.round(performance.now() - start)
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-    
-    const data = await response.json()
-    failoverResult.value = `✅ Health check passed! Served by ${data.region} in ${duration}ms`
-  } catch (error) {
-    console.error('Failover test error:', error)
-    failoverResult.value = `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    healthResult.value = `Health check from ${data.region} in ${duration}ms`
+  } catch (err) {
+    healthResult.value = `Error: ${err instanceof Error ? err.message : 'Unknown'}`
   } finally {
-    loading.value = false
+    healthLoading.value = false
   }
 }
+
+const refreshPage = () => {
+  window.location.reload()
+}
 </script>
+
+<template>
+  <div>
+    <section class="hero">
+      <p class="label">Live infrastructure proof</p>
+      <h1>This page was rendered <span>on AWS Lambda.</span></h1>
+      <p>
+        Every request is server-side rendered by a Nuxt/Nitro application running inside
+        a Lambda function. Between requests, the function scales to zero. This page
+        proves the architecture: it shows the serving region, render latency, and
+        whether this invocation was a cold start.
+      </p>
+
+      <div class="path-diagram">
+        <div class="path-node">
+          <div class="node-name">You</div>
+          <div class="node-detail">Browser</div>
+        </div>
+        <div class="path-node">
+          <div class="node-name">CloudFront</div>
+          <div class="node-detail">Edge cache</div>
+        </div>
+        <div class="path-node active">
+          <div class="node-name">Lambda</div>
+          <div class="node-detail">{{ pageData?.region || '...' }}</div>
+        </div>
+        <div class="path-node">
+          <div class="node-name">Response</div>
+          <div class="node-detail">SSR HTML</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="Render metrics">
+      <div class="metric">
+        <div class="metric-label">Rendered at</div>
+        <div class="metric-value">{{ pageData?.time || '---' }}</div>
+        <div class="metric-sub">{{ pageData?.date }} · {{ pageData?.timezone }}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Serving region</div>
+        <div class="metric-value">
+          <span class="region-badge">
+            <span class="status-dot" :class="{ cold: pageData?.coldStart }"></span>
+            {{ pageData?.region || '---' }}
+          </span>
+        </div>
+        <div class="metric-sub">{{ pageData?.regionName }}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Render latency</div>
+        <div class="metric-value">{{ pageData?.latency ?? '---' }}<span style="font-size:0.7em;color:var(--muted)">ms</span></div>
+        <div class="metric-sub">Server-side generation time</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Invocation state</div>
+        <div class="metric-value">{{ pageData?.coldStart ? 'Cold start' : 'Warm' }}</div>
+        <div class="metric-sub">#{{ formatNumber(pageData?.counter) }} requests counted</div>
+      </div>
+    </section>
+
+    <section aria-label="Diagnostics">
+      <div class="metric" style="border-top: none; padding-top: 0;">
+        <div class="metric-label">Request ID</div>
+        <div class="metric-value"><code>{{ pageData?.requestId || '---' }}</code></div>
+        <div class="metric-sub">Render mode: {{ pageData?.renderMode || '---' }} · Version: {{ pageData?.version || '---' }}</div>
+      </div>
+
+      <div class="actions">
+        <button class="button" @click="refreshPage" :disabled="!pageData">Refresh page</button>
+        <button class="button secondary" @click="testHealth" :disabled="healthLoading">
+          {{ healthLoading ? 'Checking...' : 'Test health endpoint' }}
+        </button>
+      </div>
+      <p v-if="healthResult" class="metric-sub" style="margin-top: 1rem;">{{ healthResult }}</p>
+    </section>
+
+    <section class="provenance">
+      <h2>Created with Terraform</h2>
+      <p>
+        This site is deployed by the
+        <code>terraform-aws-serverless-ssr</code> module. The same configuration
+        produces a CloudFront distribution, Lambda functions in two regions, S3
+        buckets for static assets, and a DynamoDB table for request counting.
+      </p>
+      <pre><code>module "ssr" {
+  source  = "pomo-studio/serverless-ssr/aws"
+  version = "~> 2.4"
+
+  project_name = "pomo-ssr"
+  domain_name  = "pomo.dev"
+  subdomain    = "ssr"
+}</code></pre>
+      <div class="links">
+        <a href="https://github.com/pomo-studio/terraform-aws-serverless-ssr" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws" target="_blank" rel="noreferrer">Terraform Registry</a>
+        <NuxtLink to="/about">About this demo</NuxtLink>
+      </div>
+    </section>
+  </div>
+</template>

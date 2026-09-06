@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  
+
   // Nitro configuration for AWS Lambda
   nitro: {
     preset: 'aws-lambda',
@@ -15,15 +15,13 @@ export default defineNuxtConfig({
     // CloudFront respects these Cache-Control headers
     routeRules: {
       // Static pages - cache for 1 hour
-      // Good for content that rarely changes
       '/about': {
         headers: {
           'Cache-Control': 'public, max-age=3600, s-maxage=3600'
         }
       },
 
-      // Homepage - short cache (10 seconds)
-      // Shows time updates but reduces Lambda calls
+      // Homepage - short cache so renders stay current
       '/': {
         headers: {
           'Cache-Control': 'public, max-age=10, s-maxage=10'
@@ -31,33 +29,16 @@ export default defineNuxtConfig({
       },
 
       // Health endpoint - cache for 30 seconds
-      // Frequently called by monitoring, safe to cache briefly
       '/api/health': {
         headers: {
           'Cache-Control': 'public, max-age=30, s-maxage=30'
         }
       },
 
-      // Weather API - cache for 5 minutes
-      // External API data changes slowly, caching reduces rate limits
-      '/api/weather': {
-        headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300'
-        }
-      },
-
-      // Dashboard API - no cache
-      // Real-time counter needs fresh data on every request
-      '/api/dashboard': {
+      // Render proof API - no cache, every request must be fresh
+      '/api/render': {
         headers: {
           'Cache-Control': 'no-cache, private, must-revalidate'
-        }
-      },
-
-      // Counter POST - never cache mutations
-      '/api/counter': {
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
       }
     }
@@ -69,10 +50,10 @@ export default defineNuxtConfig({
     dynamodbTable: process.env.DYNAMODB_TABLE || 'pomo-ssr-visits',
     primaryRegion: process.env.PRIMARY_REGION || 'us-east-1',
     drRegion: process.env.DR_REGION || 'us-west-2',
-    
+
     // Public keys (exposed to client)
     public: {
-      appName: 'SSR Server Clock',
+      appName: 'ssr.pomo.dev',
       apiBase: '/api'
     }
   },
@@ -83,11 +64,11 @@ export default defineNuxtConfig({
   // App head config
   app: {
     head: {
-      title: 'SSR Server Clock',
+      title: 'ssr.pomo.dev',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Multi-region SSR demo with Nuxt/Nitro on AWS Lambda' }
+        { name: 'description', content: 'A live server-side rendered proof running on AWS Lambda, deployed with terraform-aws-serverless-ssr.' }
       ]
     }
   }
