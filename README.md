@@ -39,9 +39,9 @@ The sequence is:
 5. Make a first application change and follow it through deployment.
 
 **Current status:** the walkthrough is source-reviewed and syntax-checked, not
-yet deployment-verified in a fresh account. The pinned module uses a deprecated
-Lambda runtime, so this is a sandbox learning path, not a supported-runtime
-production starter. The guide records the remaining API and recovery limitations.
+yet deployment-verified in a fresh account. This is a sandbox learning path, not
+a production starter. The guide records the remaining API and recovery
+limitations.
 
 Do not enable deployment on a fork with the original
 `config/infra-outputs.json`: it identifies the existing Pomo deployment.
@@ -51,7 +51,7 @@ Do not enable deployment on a fork with the original
 | Location | Responsibility |
 | --- | --- |
 | `app/` | Nuxt pages and server API routes |
-| `infra/` | Public SSR module pinned to `2.4.18`; infrastructure runs in HCP Terraform |
+| `infra/` | Public SSR module pinned to `2.5.2`; infrastructure runs in HCP Terraform |
 | `config/infra-outputs.json` | Deployment targets exported from infrastructure state |
 | `scripts/deploy.sh` | Build, package, and publish application code and assets |
 | `.github/workflows/` | Validation, output sync, and OIDC-based application deployment |
