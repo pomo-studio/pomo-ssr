@@ -4,6 +4,11 @@
 
 This guide covers deploying the application to AWS. The infrastructure should already be deployed (see [Infrastructure Setup](infrastructure-setup.md)).
 
+For the complete point-A-to-point-B walkthrough — including fork setup, AWS
+bootstrap, HCP Terraform workspace, and first verify — see the
+[Getting Started walkthrough](GETTING-STARTED.md). This guide covers only the
+deployment step.
+
 ## Important Directory Structure
 
 ```

@@ -2,6 +2,11 @@
 
 Before deploying this application, you need to provision the AWS infrastructure using the [terraform-aws-serverless-ssr](https://github.com/pomo-studio/terraform-aws-serverless-ssr).
 
+For the full path from fork to first deployment — including AWS bootstrap, HCP
+Terraform workspace setup, and GitHub Actions wiring — see the
+[Getting Started walkthrough](GETTING-STARTED.md). This guide covers only the
+module wiring and first apply.
+
 ## Quick Start
 
 ### 1. Create Infrastructure Directory
