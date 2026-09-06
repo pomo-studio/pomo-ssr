@@ -146,6 +146,7 @@ const refreshPage = () => {
   subdomain    = "ssr"
 }</code></pre>
       <div class="links">
+        <a href="https://github.com/pomo-studio/pomo-ssr/blob/main/docs/GETTING-STARTED.md" target="_blank" rel="noreferrer">Deploy your own copy ↗</a>
         <a href="https://github.com/pomo-studio/terraform-aws-serverless-ssr" target="_blank" rel="noreferrer">GitHub</a>
         <a href="https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws" target="_blank" rel="noreferrer">Terraform Registry</a>
         <NuxtLink to="/about">About this demo</NuxtLink>

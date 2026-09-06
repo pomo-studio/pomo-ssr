@@ -27,6 +27,9 @@ useHead({
       so you can see the page has been invoked repeatedly, even though the compute
       itself is ephemeral.
     </p>
+    <p>
+      <a href="https://github.com/pomo-studio/pomo-ssr/blob/main/docs/GETTING-STARTED.md" target="_blank" rel="noreferrer">Deploy your own copy ↗</a>
+    </p>
     <NuxtLink to="/" class="back-link">← Back to live proof</NuxtLink>
   </div>
 </template>
