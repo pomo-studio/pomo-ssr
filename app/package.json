@@ -11,7 +11,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "build:lambda": "NITRO_PRESET=aws-lambda npm run build"
+    "build:lambda": "NITRO_PRESET=aws-lambda npm run build",
+    "test:handlers": "node --test tests/api.test.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1126.0",
@@ -22,5 +23,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

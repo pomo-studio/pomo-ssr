@@ -87,6 +87,10 @@ jobs:
         working-directory: app
         run: NITRO_PRESET=aws-lambda npm run build
 
+      - name: Test built handlers
+        working-directory: app
+        run: npm run test:handlers
+
       - name: Create deployment package
         working-directory: app
         run: |

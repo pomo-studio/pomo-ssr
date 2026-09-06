@@ -10,7 +10,7 @@ table. You do not need a purchased domain, Route 53 hosted zone, or ACM certific
 
 **Verification status:** this guide was checked against this repository's
 infrastructure, workflows, deployment script, and cached public module version
-`2.4.18`. No AWS bootstrap, TFC plan/apply, or application deployment was executed
+`2.5.2`. No AWS bootstrap, TFC plan/apply, or application deployment was executed
 while writing it. The IAM examples have not been integration-tested in a fresh
 account. Read the limitations below before spending money.
 
@@ -32,12 +32,9 @@ advisories at review time. This is not a security certification.
 - Install Git, Node.js/npm, `curl`, and `jq` for local development/verification.
   Actions installs its own tools. Local AWS credentials and local Terraform are
   **not required**. Optional local Terraform use is limited to `terraform fmt`.
-- The current CI and deploy workflows use Node.js 22, but module `2.4.18` hardcodes
-  Lambda `nodejs20.x`. AWS has deprecated this runtime; recheck the live schedule on
-  [AWS Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html).
-  This is a sandbox reference, not a recommendation to launch on an unsupported runtime.
-  A supported-runtime module
-  release and matching build validation are needed for a production walkthrough;
+- The CI and deploy workflows use Node.js 22, and module `2.5.2` uses Lambda
+  `nodejs22.x`. This is a sandbox reference, not a recommendation to launch without
+  your own review.
   changing your local Node version alone does not change Lambda's runtime.
 
 Choose these values before starting. Replace uppercase placeholders in all JSON
@@ -89,7 +86,7 @@ Replace the module block in `infra/main.tf` with this, changing `acme-web` if ne
 ```hcl
 module "ssr" {
   source  = "pomo-studio/serverless-ssr/aws"
-  version = "= 2.4.18"
+  version = "= 2.5.2"
 
   providers = {
     aws.primary = aws.primary
@@ -697,9 +694,9 @@ Actions alone leaves resources live.
   module/runtime upgrade, not a console drift fix; see the prerequisite warning.
 - **DR scope:** CloudFront fails over eligible SSR/static requests on configured
   errors, but `/api/*` routes directly to primary. The Lambda DynamoDB policy in
-  `2.4.18` covers only the primary table ARN even though the app selects its local
-  region. Full DR data access needs a module fix. The UI's test button and primary
-  health success are not an end-to-end disaster-recovery test.
+  the pinned module covers only the primary table ARN even though the app selects
+  its local region. Full DR data access needs a module fix. The UI's test button
+  and primary health success are not an end-to-end disaster-recovery test.
 - **OIDC denied:** check provider audience, exact organization/project/workspace
   or repository/environment subject, and inherited TFC variables. Renaming a TFC
   project/workspace or GitHub repository requires updating trust. A GitHub branch
