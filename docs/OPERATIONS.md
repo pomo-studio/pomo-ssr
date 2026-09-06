@@ -1,6 +1,6 @@
-# Deployment Workflow
+# Operations
 
-This document explains the deployment workflow for pomo-ssr using Terraform Cloud and GitHub integration.
+This document explains the deployment workflow for the pomo-ssr reference deployment using Terraform Cloud and GitHub integration.
 
 ---
 

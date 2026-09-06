@@ -95,7 +95,7 @@ before assuming the AWS deployment role.
 - [Getting Started](docs/GETTING-STARTED.md) — deploy your own copy from scratch
 - [Infrastructure Setup](docs/infrastructure-setup.md) — module wiring and first apply
 - [Deployment Guide](docs/deployment.md) — day-to-day application deployment
-- [Deployment Workflow](docs/DEPLOYMENT.md) — TFC/GitHub integration details for the existing Pomo setup
+- [Operations](docs/OPERATIONS.md) — TFC/GitHub integration details for the existing Pomo setup
 - [Caching Strategy](docs/CACHING.md) — CloudFront caching configuration
 
 ## License
