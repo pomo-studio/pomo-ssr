@@ -6,7 +6,7 @@ This document explains the deployment workflow for the pomo-ssr reference deploy
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     GitHub Repository                        │
 │                     pomo-studio/pomo-ssr                        │
@@ -40,6 +40,7 @@ This document explains the deployment workflow for the pomo-ssr reference deploy
 **Trigger**: Push to `main` with changes to `infra/**/*.tf` or `infra/**/*.tfvars`
 
 **Workflow**:
+
 1. GitHub detects push via VCS integration
 2. TFC workspace `pomossr` automatically runs `terraform plan`
 3. Plan appears in TFC UI for review
@@ -54,6 +55,7 @@ This document explains the deployment workflow for the pomo-ssr reference deploy
 **Trigger**: Push to `main` with changes to `app/**` or `scripts/**`
 
 **Workflow**:
+
 1. GitHub Actions workflow `deploy.yml` triggers
 2. Workflow uses OIDC to authenticate to AWS (no static credentials!)
 3. Builds Nuxt application for Lambda
@@ -114,6 +116,7 @@ git push origin main  # GitHub Actions handles deploy
 ### Workspace: `pomossr`
 
 **Settings**:
+
 - Organization: `Pitangaville`
 - Working Directory: `infra/`
 - Trigger Patterns: `["infra/**/*.tf", "infra/**/*.tfvars"]`
@@ -122,6 +125,7 @@ git push origin main  # GitHub Actions handles deploy
 - Branch: `main`
 
 **Authentication**: OIDC dynamic credentials (no static AWS keys!)
+
 - Environment variables set via variable sets (managed by pomo repo)
 - `TFC_AWS_PROVIDER_AUTH=true`
 - `TFC_AWS_RUN_ROLE_ARN=arn:aws:iam::137064409667:role/terraform-cloud-pomossr`
@@ -180,6 +184,7 @@ git push origin main  # GitHub Actions handles deploy
 ### TFC plan fails
 
 **Check**:
+
 - AWS credentials: OIDC role has correct permissions?
 - Terraform syntax: Run `terraform validate` locally
 - State lock: Another run already in progress?
@@ -187,6 +192,7 @@ git push origin main  # GitHub Actions handles deploy
 ### GitHub Actions deployment fails
 
 **Check**:
+
 - AWS_ROLE_ARN secret exists and is correct
 - INFRA_OUTPUTS_JSON variable exists and is valid JSON
 - OIDC trust policy allows `pomo-studio/pomo-ssr` repo
@@ -195,6 +201,7 @@ git push origin main  # GitHub Actions handles deploy
 ### Sync workflow fails
 
 **Check**:
+
 - TF_API_TOKEN secret exists and is valid
 - GH_PAT secret exists with `repo` scope
 - TFC workspace accessible with token
@@ -230,9 +237,10 @@ terraform apply  # Applies via TFC (requires auth)
 
 The application needs to know infrastructure details (DynamoDB table name, regions, etc.) to function correctly. Here's how that configuration flows:
 
-**1. Terraform Outputs** → **2. Build-Time Environment Variables** → **3. Baked into App**
+#### 1. Terraform Outputs**→ **2. Build-Time Environment Variables** →**3. Baked into App
 
 #### 1. Terraform Creates Resources
+
 ```hcl
 # Infrastructure creates DynamoDB table
 resource "aws_dynamodb_table" "visits" {
@@ -241,6 +249,7 @@ resource "aws_dynamodb_table" "visits" {
 ```
 
 #### 2. Terraform Outputs Config
+
 ```hcl
 # Module outputs app_config with all necessary details
 output "app_config" {
@@ -287,6 +296,7 @@ runtimeConfig: {
 #### 5. Lambda Also Gets Environment Variables (Backup)
 
 Terraform also sets these as Lambda environment variables:
+
 ```hcl
 environment {
   variables = {
@@ -306,12 +316,14 @@ environment {
 ### Workflow Comparison
 
 **Local deployment** (`./scripts/deploy.sh`):
+
 1. Reads `config/infra-outputs.json`
 2. Exports env vars
 3. Builds app with correct values
 4. Deploys to AWS
 
 **GitHub Actions** (`.github/workflows/deploy.yml`):
+
 1. Writes `INFRA_OUTPUTS_JSON` variable to `config/infra-outputs.json`
 2. Runs `./scripts/deploy.sh` (same as local)
 3. Deploy script handles everything
@@ -325,16 +337,19 @@ environment {
 This project uses **OIDC dynamic credentials** throughout:
 
 **Terraform Cloud**:
+
 - Uses OIDC to assume `terraform-cloud-pomossr` IAM role
 - Short-lived tokens (1 hour)
 - Scoped to specific workspace
 
 **GitHub Actions**:
+
 - Uses OIDC to assume `github-actions-pomo-ssr` IAM role
 - Short-lived tokens (1 hour)
 - Scoped to specific repository
 
 **Benefits**:
+
 - No AWS access keys to rotate or leak
 - Automatic expiration
 - Better audit trail (CloudTrail shows which run/workflow)

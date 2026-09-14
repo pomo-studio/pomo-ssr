@@ -26,14 +26,14 @@ Cache-Control headers are set in `nuxt.config.ts` using Nitro's `routeRules`. Cl
 
 ## Cache-Control Headers Explained
 
-```
+```text
 Cache-Control: public, max-age=300, s-maxage=300
                │      │            └─ CDN cache (CloudFront): 5 minutes
                │      └─ Browser cache: 5 minutes
                └─ Cacheable by CDN and browser
 ```
 
-**Header values:**
+#### Header values:
 
 - `public` - Can be cached by CDN and browsers
 - `private` - Only browser can cache (not CDN)
@@ -46,14 +46,16 @@ Cache-Control: public, max-age=300, s-maxage=300
 ## Benefits
 
 ### Without Caching
-```
+
+```text
 Every request → Lambda execution
 - Cost: ~$0.20 per 1M requests
 - Latency: 50-200ms (Lambda execution)
 ```
 
 ### With Caching (80% hit rate)
-```
+
+```text
 80% requests → CloudFront cache (cached)
 20% requests → Lambda execution
 - Cost: ~$0.04 per 1M requests (80% savings)
@@ -126,7 +128,8 @@ curl -I https://app.example.com/api/health
 ```
 
 Look for:
-```
+
+```text
 cache-control: public, max-age=30, s-maxage=30
 x-cache: Hit from cloudfront (or Miss from cloudfront)
 age: 15 (seconds since cached)

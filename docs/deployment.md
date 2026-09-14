@@ -6,12 +6,12 @@ This guide covers deploying the application to AWS. The infrastructure should al
 
 For the complete point-A-to-point-B walkthrough — including fork setup, AWS
 bootstrap, HCP Terraform workspace, and first verify — see the
-[Getting Started walkthrough](GETTING-STARTED.md). This guide covers only the
+[Getting Started walkthrough](getting-started.md). This guide covers only the
 deployment step.
 
 ## Important Directory Structure
 
-```
+```text
 my-app/                          # Repository root (run deploy from here)
 ├── app/                         # Nuxt application
 │   ├── package.json             # npm reads this
@@ -35,6 +35,7 @@ cd ~/my-app                      # Go to app repository root
 ```
 
 The deploy script will:
+
 1. Read `config/infra-outputs.json`
 2. `cd app && npm install` (installs dependencies)
 3. Build the application for Lambda
@@ -80,7 +81,8 @@ cd ~/my-app
 ```
 
 Expected output:
-```
+
+```text
 📋 Loading configuration from config/infra-outputs.json
 🚀 Deploying my-app
    Primary: us-east-1 | DR: us-west-2
@@ -157,6 +159,7 @@ git push origin main
 ```
 
 GitHub Actions will:
+
 - Build the application
 - Run tests
 - Deploy to AWS (if secrets are configured)

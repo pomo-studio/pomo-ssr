@@ -67,10 +67,10 @@ git remote -v
 git rm config/infra-outputs.json
 ```
 
-3. Delete any inherited repository/environment variable named `INFRA_OUTPUTS_JSON`
+1. Delete any inherited repository/environment variable named `INFRA_OUTPUTS_JSON`
    in GitHub Settings. Check organization-level variables too. Do not copy
    `config/infra-outputs.example.json` over the deleted file; it is only an example.
-4. Make the edits in the next section, then commit the deletion and edits together
+2. Make the edits in the next section, then commit the deletion and edits together
    and push them to your fork's `main` while Actions is still disabled.
 
 The deployment script trusts the committed config. It uploads code, updates

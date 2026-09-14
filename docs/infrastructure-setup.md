@@ -4,7 +4,7 @@ Before deploying this application, you need to provision the AWS infrastructure 
 
 For the full path from fork to first deployment — including AWS bootstrap, HCP
 Terraform workspace setup, and GitHub Actions wiring — see the
-[Getting Started walkthrough](GETTING-STARTED.md). This guide covers only the
+[Getting Started walkthrough](getting-started.md). This guide covers only the
 module wiring and first apply.
 
 ## Quick Start
@@ -153,7 +153,7 @@ For `INFRA_OUTPUTS_JSON`, copy the entire contents of `config/infra-outputs.json
 
 After setup, you'll have two directories:
 
-```
+```text
 ~/my-app-infrastructure/         # Infrastructure (Terraform)
 ├── main.tf
 ├── .terraform/
@@ -170,7 +170,8 @@ After setup, you'll have two directories:
 └── ...
 ```
 
-**Important**: 
+**Important**:
+
 - Terraform runs in `~/my-app-infrastructure/`
 - The deploy script (`./scripts/deploy.sh`) runs from `~/my-app/` (root of app repo)
 - `npm install` runs inside `~/my-app/app/` (where package.json lives)
@@ -190,6 +191,7 @@ After setup, you'll have two directories:
 ## Module Documentation
 
 For full module documentation, see:
+
 - [terraform-aws-serverless-ssr README](https://github.com/pomo-studio/terraform-aws-serverless-ssr#readme)
 - [Basic Example](https://github.com/pomo-studio/terraform-aws-serverless-ssr/tree/main/examples/basic)
 - [Complete Example](https://github.com/pomo-studio/terraform-aws-serverless-ssr/tree/main/examples/complete)

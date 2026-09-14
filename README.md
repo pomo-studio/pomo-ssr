@@ -6,7 +6,7 @@ and DynamoDB request counting.
 
 [Live demo](https://ssr.pomo.dev) ·
 [Terraform module](https://github.com/pomo-studio/terraform-aws-serverless-ssr) ·
-[Getting started walkthrough](docs/GETTING-STARTED.md)
+[Getting started walkthrough](docs/getting-started.md)
 
 ## Run It Locally
 
@@ -24,7 +24,7 @@ rendering does not verify them.
 
 ## Deploy Your Own Copy
 
-Follow the [getting-started walkthrough](docs/GETTING-STARTED.md).
+Follow the [getting-started walkthrough](docs/getting-started.md).
 
 It uses your own AWS sandbox, HCP Terraform workspace, and GitHub repository.
 The first path uses a CloudFront hostname: no purchased domain, private Pomo
@@ -92,11 +92,11 @@ before assuming the AWS deployment role.
 
 ## Documentation
 
-- [Getting Started](docs/GETTING-STARTED.md) — deploy your own copy from scratch
+- [Getting Started](docs/getting-started.md) — deploy your own copy from scratch
 - [Infrastructure Setup](docs/infrastructure-setup.md) — module wiring and first apply
 - [Deployment Guide](docs/deployment.md) — day-to-day application deployment
-- [Operations](docs/OPERATIONS.md) — TFC/GitHub integration details for the existing Pomo setup
-- [Caching Strategy](docs/CACHING.md) — CloudFront caching configuration
+- [Operations](docs/operations.md) — TFC/GitHub integration details for the existing Pomo setup
+- [Caching Strategy](docs/caching.md) — CloudFront caching configuration
 
 ## License
 
