@@ -1,6 +1,6 @@
 # Pomo SSR
 
-A public application reference for [postmodern.tf](https://postmodern.tf): Nuxt
+A public application reference for [postmodern.tf](https://pomo.dev): Nuxt
 server-side rendering on AWS Lambda, with CloudFront delivery, S3 static assets,
 and DynamoDB request counting.
 
@@ -101,3 +101,5 @@ before assuming the AWS deployment role.
 ## License
 
 MIT
+
+A postmodern.tf reference application by [André Pitanga](https://pomo.studio).

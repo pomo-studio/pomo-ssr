@@ -18,7 +18,8 @@ useHead({
     </main>
     <footer class="footer">
       <p>
-        Deployed with
+        A <a href="https://pomo.dev">postmodern.tf</a> demo by
+        <a href="https://pomo.studio">André Pitanga</a>. Deployed with
         <a href="https://github.com/pomo-studio/terraform-aws-serverless-ssr" target="_blank" rel="noreferrer">terraform-aws-serverless-ssr</a>
         · {{ new Date().getFullYear() }}
       </p>
